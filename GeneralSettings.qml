@@ -12,9 +12,9 @@ Column {
 
   property color foreground: Commons.Color.foreground
   property string fontFamily: Style.font.family
-  // The resolved display language ("en" | "pt").
+  // The resolved display language (one of Strings.LANGUAGES).
   property string language: "en"
-  // The stored setting ("auto" | "en" | "pt"), not the resolved language.
+  // The stored setting ("auto" or one of Strings.LANGUAGES), not the resolved language.
   property string languageSetting: "auto"
   property bool weekStartsMonday: true
 

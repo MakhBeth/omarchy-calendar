@@ -69,7 +69,8 @@ time away for an event title would be a downgrade you pay for all day.
   notification history. A shell reload never repeats them. See
   [Reminders](#reminders)
 - **Keyboard first**, see [Keyboard](#keyboard)
-- **English and Portuguese**, following your locale or set by hand
+- **English, Portuguese, French, Spanish and German**, following your locale
+  or set by hand. Quick add reads English and Portuguese in every language
 - Per-calendar visibility, week start, countdown lead time and a 24 h or 12 h
   time format
 - Google's working-location markers hidden by default, declined invitations
@@ -453,7 +454,7 @@ under it that says what it does.
 | Panel | A preset: Minimal or Standard. Where the agenda sits: beside or under the calendar. A switch for each block: year and life progress, shortcut legend, quick add, next event card, upcoming days |
 | Bar | How early the bar announces what is next: never, 5, 15, 30 or 60 minutes. How long "Now" stays on during an event, and whether the next event takes over. Desktop reminders, and whether they name the event. A preview puts your choices in words |
 | Calendars | Show or hide each calendar, with its event count. The list comes from your own events, so it needs no configuration. Then working location events (Google's work-from-home markers, hidden by default) and declined invitations (struck through when shown) |
-| General | Language: Automatic follows your locale, or English, or Português. The first day of the week. Whether the panel can create and edit events. The sync state: event count, source and last sync time |
+| General | Language: Automatic follows your locale, or English, Português, Français, Español or Deutsch. The first day of the week. Whether the panel can create and edit events. The sync state: event count, source and last sync time |
 
 Event times follow `eventTimeFormat` in `shell.json`, a Qt date-time format
 such as `HH:mm` or `h:mm AP`.

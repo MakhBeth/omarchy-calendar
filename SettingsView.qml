@@ -15,7 +15,7 @@ Item {
 
   property color foreground: "white"
   property string fontFamily: ""
-  // The resolved display language ("en" | "pt").
+  // The resolved display language (one of Strings.LANGUAGES).
   property string language: "en"
   property string section: "panel"
 
@@ -38,7 +38,7 @@ Item {
   property bool hideDeclined: false
 
   // General
-  // The stored setting ("auto" | "en" | "pt"), not the resolved language.
+  // The stored setting ("auto" or one of Strings.LANGUAGES), not the resolved language.
   property string languageSetting: "auto"
   property bool weekStartsMonday: true
   property bool canWrite: false

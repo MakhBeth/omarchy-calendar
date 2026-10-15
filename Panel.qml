@@ -36,9 +36,7 @@ Panel {
   readonly property var uiLocale: Qt.locale(Strings.localeName(language))
   // Day and month names come from uiLocale; the order they go in is the
   // language's own.
-  readonly property var datePatterns: language === "pt"
-    ? { hero: "d 'de' MMMM", long: "dddd, d 'de' MMMM", short: "ddd, d MMM", month: "MMMM 'de' yyyy" }
-    : { hero: "MMMM d", long: "dddd, MMMM d", short: "ddd, MMM d", month: "MMMM yyyy" }
+  readonly property var datePatterns: Strings.datePatterns(language)
 
   function tr(key, args) {
     return Strings.tr(root.language, key, args)

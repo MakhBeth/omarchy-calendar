@@ -328,8 +328,11 @@ function readRelative(scanner, now, today) {
   return take(scanner, QUICK_PATTERNS.now, function() { return { at: now } })
 }
 
+// Languages whose numeric dates put the day first (12/10 is 12 October).
+var DAY_FIRST_LANGUAGES = ["pt", "fr", "es", "de"]
+
 function readDate(scanner, today, lang) {
-  var dayFirst = lang === "pt"
+  var dayFirst = DAY_FIRST_LANGUAGES.indexOf(lang) >= 0
   var p = QUICK_PATTERNS
   var date = take(scanner, p.isoDate, function(m) {
     return validDay(Number(m[1]), Number(m[2]) - 1, Number(m[3]))

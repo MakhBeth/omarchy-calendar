@@ -124,8 +124,9 @@ test('parseQuickAdd: a day the next month lacks rolls to the first month that ha
   assert.equal(QuickAdd.parseQuickAdd('x dia 40', NOW, 'pt').title, 'x dia 40')
 })
 
-test('parseQuickAdd: d/m in Portuguese, m/d in English, next year once past', () => {
+test('parseQuickAdd: d/m in every language but English, m/d in English, next year once past', () => {
   assert.deepEqual(when('x 12/10', 'pt'), ['2026-10-12', 'all day'])
+  for (const lang of ['fr', 'es', 'de']) assert.deepEqual(when('x 12/10', lang), ['2026-10-12', 'all day'], lang)
   assert.deepEqual(when('x 12/10', 'en'), ['2026-12-10', 'all day'])
   assert.deepEqual(when('x 1/3', 'pt'), ['2027-03-01', 'all day'])
   assert.deepEqual(when('x 5/10/2027', 'pt'), ['2027-10-05', 'all day'])
