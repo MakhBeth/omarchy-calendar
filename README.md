@@ -78,8 +78,8 @@ time away for an event title would be a downgrade you pay for all day.
   cycle them, the year and life progress bars if you want them back
 - Theme aware, light themes included, because it is a fork of the built-in clock
 - No Google Cloud project needed if you read your calendars from their secret
-  iCal address (read only), through Evolution Data Server
-  (community-maintained), or from any other source that writes the events file
+  iCal address (read only), through Evolution Data Server or caldir
+  (both community-maintained), or from any other source that writes the events file
 
 ## Requirements
 
@@ -327,6 +327,10 @@ One known limit: clicking an event opens nothing on this backend, because
 CalDAV does not carry Google's link to the event.
 
 ## Sync from caldir
+
+> **Community-maintained.** The author does not run caldir, so the people who
+> use this backend are the ones who test it. When you open an issue about it,
+> say that you are on the caldir backend.
 
 Already using [caldir](https://caldir.org)? It keeps your calendars as plain
 `.ics` files and signs in to Google, iCloud or CalDAV itself, so the sync can
