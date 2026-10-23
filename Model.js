@@ -267,14 +267,24 @@ function clockFormats(vertical) {
   return vertical ? VERTICAL_CLOCK_FORMATS.slice() : CLOCK_FORMATS.slice()
 }
 
-// The presets in a fixed order, plus the configured alternate and current
-// format when they are something else. The order must not depend on which
-// entry is current: cycling writes the result back to shell.json, and a ring
-// that reshuffled itself around the current value would bounce between two
-// entries instead of walking.
-function clockFormatRing(configured, configuredAlt, presets) {
+// The label a bar shows before anything is set, and the one its alternate
+// slot starts on. Both are presets.
+function defaultClockFormat(vertical) {
+  return vertical ? VERTICAL_CLOCK_FORMATS[0] : CLOCK_FORMATS[0]
+}
+
+function defaultAltClockFormat(vertical) {
+  return vertical ? VERTICAL_CLOCK_FORMATS[2] : CLOCK_FORMATS[6]
+}
+
+// The presets in a fixed order, then the user's own format, the configured
+// alternate and the current format when they are something else. The order
+// must not depend on which entry is current: cycling writes the result back
+// to shell.json, and a ring that reshuffled itself around the current value
+// would bounce between two entries instead of walking.
+function clockFormatRing(configured, configuredAlt, presets, custom) {
   var ring = []
-  var candidates = (presets || []).concat([configuredAlt, configured])
+  var candidates = (presets || []).concat([custom, configuredAlt, configured])
   for (var i = 0; i < candidates.length; i++) {
     var format = text(candidates[i])
     if (format === "" || ring.indexOf(format) !== -1) continue
@@ -288,6 +298,50 @@ function clockFormatRing(configured, configuredAlt, presets) {
 function nextClockFormat(ring, current) {
   if (!ring || ring.length === 0) return ""
   return ring[(ring.indexOf(text(current)) + 1) % ring.length]
+}
+
+// A typed format as it is stored: each line trimmed with its runs of spaces
+// made one, and blank lines at either end dropped. Line breaks stay, since a
+// vertical bar draws one line of the clock per line of the format.
+function cleanClockFormat(format) {
+  return text(format).split("\n").map(function(line) {
+    return line.trim().replace(/\s+/g, " ")
+  }).join("\n").replace(/^\n+|\n+$/g, "")
+}
+
+// The preset that `format` already is, or "". Compared cleaned, so
+// "dddd  HH:mm" typed by hand still finds "dddd HH:mm".
+function presetClockFormat(format, presets) {
+  var wanted = cleanClockFormat(format)
+  if (wanted === "") return ""
+  for (var i = 0; i < (presets || []).length; i++)
+    if (cleanClockFormat(presets[i]) === wanted) return presets[i]
+  return ""
+}
+
+// What to store when the user's own clock format is set to `typed`:
+// { custom, format }, for the bar's custom key and its format key. The
+// custom format has a key of its own so right click can walk away from it
+// and come back: cycling only ever rewrites the format key. A preset is not
+// kept as a custom format, since the ring already has it. Clearing the field
+// puts a bar that still shows the old custom format back on `defaultFormat`.
+function customClockFormatValues(typed, previousCustom, currentFormat, presets, defaultFormat) {
+  var format = cleanClockFormat(typed)
+  var preset = presetClockFormat(format, presets)
+  if (preset !== "") return { custom: "", format: preset }
+  if (format !== "") return { custom: format, format: format }
+  var showsOld = text(currentFormat) === text(previousCustom)
+  return { custom: "", format: showsOld ? defaultFormat : text(currentFormat) }
+}
+
+// The custom format to keep when right click leaves `current`. A format
+// written by hand in shell.json, before there was a custom key, would be
+// lost on that click, so it becomes the custom format instead. One already
+// set, a preset or the alternate format is left alone.
+function adoptedCustomFormat(current, custom, alt, presets) {
+  if (text(custom) !== "") return text(custom)
+  if (text(current) === "" || text(current) === text(alt)) return ""
+  return presetClockFormat(current, presets) === "" ? text(current) : ""
 }
 
 // ---- Month grid

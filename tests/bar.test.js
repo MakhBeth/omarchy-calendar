@@ -162,3 +162,83 @@ test('barState keeping the current event: live until its end, next one or not', 
   assert.equal(state.phase, 'live')
   assert.equal(state.event.id, 'now')
 })
+
+const PRESETS = Model.clockFormats(false)
+
+test('clockFormatRing keeps the custom format after the presets, whatever is current', () => {
+  const ring = Model.clockFormatRing('HH:mm', '', PRESETS, 'dddd d MMM HH:mm')
+  assert.equal(ring.length, PRESETS.length + 1)
+  assert.equal(ring[PRESETS.length], 'dddd d MMM HH:mm')
+  assert.deepEqual(Model.clockFormatRing('dddd d MMM HH:mm', '', PRESETS, 'dddd d MMM HH:mm'), ring)
+})
+
+test('right click walks off the custom format and comes back to it', () => {
+  const custom = 'dddd d MMM HH:mm'
+  let current = custom
+  const seen = []
+  for (let i = 0; i <= PRESETS.length; i++) {
+    current = Model.nextClockFormat(Model.clockFormatRing(current, '', PRESETS, custom), current)
+    seen.push(current)
+  }
+  assert.equal(seen[0], PRESETS[0])
+  assert.equal(seen[seen.length - 1], custom)
+})
+
+test('presetClockFormat finds a preset typed with extra spaces, and nothing else', () => {
+  assert.equal(Model.presetClockFormat('  dddd   HH:mm ', PRESETS), 'dddd HH:mm')
+  assert.equal(Model.presetClockFormat('dddd d MMM HH:mm', PRESETS), '')
+  assert.equal(Model.presetClockFormat('', PRESETS), '')
+})
+
+test('customClockFormatValues stores a new format and shows it', () => {
+  assert.deepEqual(Model.customClockFormatValues(' dddd d MMM HH:mm ', '', 'HH:mm', PRESETS, 'dddd HH:mm'),
+    { custom: 'dddd d MMM HH:mm', format: 'dddd d MMM HH:mm' })
+})
+
+test('customClockFormatValues never keeps a preset as the custom format', () => {
+  assert.deepEqual(Model.customClockFormatValues('HH:mm', 'dddd d MMM HH:mm', 'dddd d MMM HH:mm', PRESETS, 'dddd HH:mm'),
+    { custom: '', format: 'HH:mm' })
+})
+
+test('clearing the custom format puts the bar back on the default only if it still showed it', () => {
+  assert.deepEqual(Model.customClockFormatValues('', 'dddd d MMM HH:mm', 'dddd d MMM HH:mm', PRESETS, 'dddd HH:mm'),
+    { custom: '', format: 'dddd HH:mm' })
+  assert.deepEqual(Model.customClockFormatValues('', 'dddd d MMM HH:mm', 'h:mm AP', PRESETS, 'dddd HH:mm'),
+    { custom: '', format: 'h:mm AP' })
+})
+
+const VERTICAL = Model.clockFormats(true)
+
+test('cleanClockFormat trims each line and keeps the line breaks', () => {
+  assert.equal(Model.cleanClockFormat('  dddd   d MMM  '), 'dddd d MMM')
+  assert.equal(Model.cleanClockFormat('\n ddd \nHH\n  mm \n\n'), 'ddd\nHH\nmm')
+})
+
+test('presetClockFormat tells a vertical preset from the same tokens on one line', () => {
+  assert.equal(Model.presetClockFormat('HH\n—\nmm\n', VERTICAL), 'HH\n—\nmm')
+  assert.equal(Model.presetClockFormat('HH — mm', VERTICAL), '')
+})
+
+test('customClockFormatValues stores a vertical format with its line breaks', () => {
+  assert.deepEqual(Model.customClockFormatValues('ddd\nHH\nmm\n', '', 'HH\n—\nmm', VERTICAL, 'HH\n—\nmm'),
+    { custom: 'ddd\nHH\nmm', format: 'ddd\nHH\nmm' })
+})
+
+test('adoptedCustomFormat keeps a hand-written format that right click is about to leave', () => {
+  const alt = "d MMMM 'W'ww yyyy"
+  assert.equal(Model.adoptedCustomFormat('HH:mm:ss', '', alt, PRESETS), 'HH:mm:ss')
+  assert.equal(Model.adoptedCustomFormat('HH:mm:ss', 'ddd HH:mm', alt, PRESETS), 'ddd HH:mm')
+  assert.equal(Model.adoptedCustomFormat('dddd HH:mm', '', alt, PRESETS), '')
+  assert.equal(Model.adoptedCustomFormat(alt, '', alt, PRESETS), '')
+  assert.equal(Model.adoptedCustomFormat('', '', alt, PRESETS), '')
+})
+
+test('the default and alternate formats are presets of their orientation', () => {
+  for (const vertical of [false, true]) {
+    const presets = Model.clockFormats(vertical)
+    assert.ok(presets.includes(Model.defaultClockFormat(vertical)))
+    assert.ok(presets.includes(Model.defaultAltClockFormat(vertical)))
+  }
+  assert.equal(Model.defaultClockFormat(false), 'dddd HH:mm')
+  assert.equal(Model.defaultAltClockFormat(true), "dd\nMMM\n'W'ww\n''yy")
+})

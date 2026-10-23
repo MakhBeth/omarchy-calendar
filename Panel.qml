@@ -30,6 +30,8 @@ Panel {
   // switchPanelFrom looks the slot up the same way. It also owns reminders,
   // which is where snoozing goes.
   property var hostWidget: null
+  // The bar stands on a screen edge, and its clock is a stack of lines.
+  readonly property bool barVertical: !!hostWidget && hostWidget.vertical === true
   readonly property var barIdentity: hostWidget || root
 
   readonly property string language: Strings.resolveLanguage(setting("language", "auto"), Qt.locale().name)
@@ -1071,6 +1073,11 @@ Panel {
                 nextDuringEvent: String(root.setting("nextDuringEvent", "announce"))
                 reminders: root.setting("reminders", true) !== false
                 reminderDetails: root.setting("reminderDetails", false) === true
+                barVertical: root.barVertical
+                clockFormat: String(root.setting(root.barVertical ? "verticalFormat" : "format", Model.defaultClockFormat(root.barVertical)))
+                clockAltFormat: String(root.setting(root.barVertical ? "verticalFormatAlt" : "formatAlt", Model.defaultAltClockFormat(root.barVertical)))
+                now: root.nowTick
+                customFormat: String(root.setting(root.barVertical ? "customVerticalFormat" : "customFormat", ""))
                 syncState: root.syncState
                 setupCommand: root.setupCommand
                 setupCommandCopied: root.setupCommandCopied
@@ -1085,6 +1092,7 @@ Panel {
                 onWriteSetupCopyRequested: root.copyWriteSetupCommand()
                 onCloseRequested: root.settingsOpen = false
                 onPicked: function(values) { root.persistSettings(values) }
+                onEditingFinished: root.focusKeys()
                 onCalendarToggled: function(calendarId) { root.toggleCalendar(calendarId) }
                 onWorkingLocationToggled: root.persistSettings({ showWorkingLocation: !root.showWorkingLocation })
                 onHideDeclinedToggled: root.persistSettings({ hideDeclined: !root.hideDeclined })

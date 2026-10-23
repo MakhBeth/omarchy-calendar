@@ -29,6 +29,12 @@ Item {
   property string nextDuringEvent: "announce"
   property bool reminders: true
   property bool reminderDetails: false
+  property bool barVertical: false
+  property string clockFormat: ""
+  property string clockAltFormat: ""
+  property string customFormat: ""
+  // The panel's clock, for the format examples.
+  property date now: new Date()
 
   // Calendars
   property var calendars: []
@@ -53,6 +59,8 @@ Item {
   signal closeRequested()
   // The settings to store as they are, for example { reminders: false }.
   signal picked(var values)
+  // A text field let go of the keys, so the panel can take them back.
+  signal editingFinished()
   signal calendarToggled(string calendarId)
   signal workingLocationToggled()
   signal hideDeclinedToggled()
@@ -233,7 +241,13 @@ Item {
         nextDuringEvent: root.nextDuringEvent
         reminders: root.reminders
         reminderDetails: root.reminderDetails
+        vertical: root.barVertical
+        clockFormat: root.clockFormat
+        clockAltFormat: root.clockAltFormat
+        customFormat: root.customFormat
+        now: root.now
         onPicked: function(values) { root.picked(values) }
+        onEditingFinished: root.editingFinished()
       }
 
       CalendarSettings {
