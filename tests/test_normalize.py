@@ -1,4 +1,5 @@
 import unittest
+from datetime import date
 from zoneinfo import ZoneInfo
 
 from omarchy_calendar_sync import normalize
@@ -383,6 +384,35 @@ class TestRowOrder(unittest.TestCase):
             ("2026-08-10", "a", "x"), ("2026-08-10", "a", "y"),
             ("2026-08-10", "b", "x"), ("2026-08-11", "a", "x"),
         ])
+
+
+class TestWindow(unittest.TestCase):
+    WINDOW = (date(2026, 10, 19), date(2026, 12, 25))
+
+    def test_an_event_ending_in_year_9998_costs_only_the_window(self):
+        event = all_day("2026-10-26", "9998-12-31")
+        rows = normalize.normalize_event(event, CAL, BOGOTA, self.WINDOW)
+        self.assertEqual(rows[0]["dateKey"], "2026-10-26")
+        self.assertEqual(rows[-1]["dateKey"], "2026-12-25")
+        self.assertEqual(len(rows), 61)
+        self.assertEqual(rows[0]["end"], "9998-12-31T00:00:00-05:00")
+
+    def test_an_event_that_began_before_the_window_starts_at_its_edge(self):
+        event = all_day("2020-01-01", "2026-10-22")
+        rows = normalize.normalize_event(event, CAL, BOGOTA, self.WINDOW)
+        self.assertEqual([r["dateKey"] for r in rows], ["2026-10-19", "2026-10-20", "2026-10-21"])
+        self.assertEqual(rows[0]["start"], "2020-01-01T00:00:00-05:00")
+
+    def test_an_event_inside_the_window_is_not_touched(self):
+        event = all_day("2026-10-26", "2026-10-29")
+        self.assertEqual(
+            normalize.normalize_event(event, CAL, BOGOTA, self.WINDOW),
+            normalize.normalize_event(event, CAL, BOGOTA),
+        )
+
+    def test_no_window_keeps_every_day(self):
+        event = all_day("2026-10-26", "2027-10-26")
+        self.assertEqual(len(normalize.normalize_event(event, CAL, BOGOTA)), 365)
 
 
 if __name__ == "__main__":

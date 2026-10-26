@@ -115,19 +115,24 @@ def row_order(row):
     return (row["dateKey"], row["start"], row["title"])
 
 
-def normalize_all(gevents, calendar, tz):
+def normalize_all(gevents, calendar, tz, window=None):
     """Normalize a list of Google events, flattening the per-day rows."""
     rows = []
     for gevent in gevents:
-        rows.extend(normalize_event(gevent, calendar, tz))
+        rows.extend(normalize_event(gevent, calendar, tz, window))
     return rows
 
 
-def normalize_event(gevent, calendar, tz):
+def normalize_event(gevent, calendar, tz, window=None):
     """Return one contract row per local day this event covers.
 
     Rows produced from a single Google event share its id, so consumers must
     key on id plus dateKey, never on id alone.
+
+    `window` is the (first, last) local dates the sync fetched. Days outside
+    it get no row: the widget never shows them, and an event that ends in the
+    year 9998 would otherwise cost millions of rows. The rows keep the event's
+    real start and end.
     """
     if gevent.get("status") == "cancelled":
         return []
@@ -182,7 +187,7 @@ def normalize_event(gevent, calendar, tz):
             "description": description,
             "reminders": reminders,
         }
-        for day in _covered_days(start_dt, end_dt, all_day)
+        for day in _covered_days(start_dt, end_dt, all_day, window)
     ]
 
 
@@ -200,8 +205,8 @@ def _parse_endpoint(node, tz):
     return parsed_dt.astimezone(tz), False
 
 
-def _covered_days(start_dt, end_dt, all_day):
-    """Inclusive list of local dates the event occupies."""
+def _covered_days(start_dt, end_dt, all_day, window=None):
+    """Inclusive list of local dates the event occupies, within `window`."""
     first = start_dt.date()
 
     if all_day:
@@ -215,6 +220,10 @@ def _covered_days(start_dt, end_dt, all_day):
 
     if last < first:
         last = first
+
+    if window:
+        first = max(first, window[0])
+        last = min(last, window[1])
 
     days = []
     cursor = first

@@ -94,6 +94,10 @@ def run(client, cfg, now, out_path, local_tz):
         # dedup. The sort is stable, so the rest keep their name order.
         calendars.sort(key=lambda calendar: not calendar.get("primary"))
         time_min, time_max = config_module.window_bounds(cfg, now)
+        window = (
+            datetime.fromisoformat(time_min).astimezone(local_tz).date(),
+            datetime.fromisoformat(time_max).astimezone(local_tz).date(),
+        )
 
         rows = []
         seen = set()
@@ -102,7 +106,7 @@ def run(client, cfg, now, out_path, local_tz):
             raw = client.events(calendar["id"], time_min, time_max)
             fresh = _drop_duplicates(raw, seen)
             fetched.extend(fresh)
-            rows.extend(normalize.normalize_all(fresh, calendar, local_tz))
+            rows.extend(normalize.normalize_all(fresh, calendar, local_tz, window))
 
         source = client.SOURCE_NAME + "/" + ".".join(
             str(part) for part in client.version()
