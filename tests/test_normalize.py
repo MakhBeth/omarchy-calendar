@@ -220,6 +220,14 @@ class TestMeetingUrl(unittest.TestCase):
              "https://us02web.zoom.us/j/8812345?pwd=Xy1"),
             ({"description": "<a href=\"https://teams.microsoft.com/l/meetup-join/19%3a1\">Join</a>"},
              "https://teams.microsoft.com/l/meetup-join/19%3a1"),
+            # Outlook's published feed wraps every link in Safe Links; the
+            # Teams address is the url parameter, encoded once.
+            ({"description": "Join<https://eur02.safelinks.protection.outlook.com/ap/t-59584e83/"
+                             "?url=https%3A%2F%2Fteams.microsoft.com%2Fl%2Fmeetup-join%2F19%253ameeting_abc"
+                             "%2540thread.v2%2F0%3Fcontext%3D%257b%2522Tid%2522%253a%25221%2522%257d"
+                             "&data=05%7C02%7C&sdata=xyz%3D&reserved=0>"},
+             "https://teams.microsoft.com/l/meetup-join/19%3ameeting_abc%40thread.v2/0"
+             "?context=%7b%22Tid%22%3a%221%22%7d"),
         )
         for fields, expected in cases:
             event = timed("2026-08-10T09:00:00-05:00", "2026-08-10T09:15:00-05:00")
