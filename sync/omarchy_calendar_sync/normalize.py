@@ -6,6 +6,7 @@ testable without freezing time.
 """
 
 import re
+import urllib.parse
 from datetime import date, datetime, time, timedelta
 
 from .contract import is_https_url
@@ -42,9 +43,28 @@ _TEXT_MEETING_URL = re.compile(
 )
 
 
+# Outlook rewrites every link in an invitation through Safe Links, so the
+# Teams address arrives as https://eur02.safelinks.protection.outlook.com/
+# ...?url=https%3A%2F%2Fteams.microsoft.com%2F... and the meeting hosts above
+# never match. The real address is the url parameter, decoded once.
+_SAFE_LINK = re.compile(
+    r"https://(?:[\w-]+\.)*safelinks\.protection\.outlook\.com/" + _URL_TAIL,
+    re.IGNORECASE,
+)
+
+
+def _unwrap_safe_links(text):
+    def unwrap(match):
+        query = urllib.parse.urlsplit(match.group(0)).query
+        wrapped = urllib.parse.parse_qs(query).get("url", [""])[0]
+        return wrapped or match.group(0)
+
+    return _SAFE_LINK.sub(unwrap, text)
+
+
 def _meeting_url_in_text(*texts):
     for text in texts:
-        match = _TEXT_MEETING_URL.search(str(text or ""))
+        match = _TEXT_MEETING_URL.search(_unwrap_safe_links(str(text or "")))
         if match:
             found = _https_only(match.group(0).rstrip(".,;:!?"))
             if found:
