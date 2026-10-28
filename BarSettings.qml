@@ -17,6 +17,7 @@ Column {
   property string fontFamily: Style.font.family
   property string language: "en"
   property int leadMinutes: 15
+  property int titleLimit: 28
   // "untilEnd" | "firstMinutes"
   property string duringEvent: "untilEnd"
   // "announce" | "keep"
@@ -402,6 +403,23 @@ Column {
     })
     value: String(root.leadMinutes)
     onChosen: function(value) { root.pick("announceLeadMinutes", Number(value)) }
+  }
+
+  Gap { visible: titleLimitChoice.visible }
+
+  // Only matters while the bar announces anything.
+  ChoiceGroup {
+    id: titleLimitChoice
+    visible: root.leadMinutes > 0
+    foreground: root.foreground
+    fontFamily: root.fontFamily
+    label: root.tr("settings.titleLimit")
+    hint: root.tr("settings.titleLimitHint")
+    options: [12, 16, 20, 28, 40].map(function(chars) {
+      return { value: String(chars), label: root.tr("settings.chars", [chars]) }
+    })
+    value: String(root.titleLimit)
+    onChosen: function(value) { root.pick("announceTitleLimit", Number(value)) }
   }
 
   Gap {}

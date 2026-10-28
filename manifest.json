@@ -31,7 +31,8 @@
       "reminders": true,
       "announceLeadMinutes": 15,
       "duringEvent": "untilEnd",
-      "nextDuringEvent": "announce"
+      "nextDuringEvent": "announce",
+      "announceTitleLimit": 28
     },
     "schema": [
       {
@@ -98,6 +99,16 @@
         "step": 5,
         "defaultValue": 15,
         "description": "Show the next event beside the clock this long before it starts. 0 keeps the clock alone."
+      },
+      {
+        "key": "announceTitleLimit",
+        "type": "number",
+        "label": "Announced title length",
+        "min": 8,
+        "max": 60,
+        "step": 1,
+        "defaultValue": 28,
+        "description": "Longest title the bar announces, in characters; longer ones end in an ellipsis. Lower it when the announcement runs into the widgets beside it."
       },
       {
         "key": "duringEvent",

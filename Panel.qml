@@ -1069,6 +1069,7 @@ Panel {
                 hideDeclined: root.hideDeclined
                 weekStartsMonday: root.weekStart === 1
                 announceLeadMinutes: root.setting("announceLeadMinutes", 15)
+                announceTitleLimit: Number(root.setting("announceTitleLimit", 28)) || 28
                 duringEvent: String(root.setting("duringEvent", "untilEnd"))
                 nextDuringEvent: String(root.setting("nextDuringEvent", "announce"))
                 reminders: root.setting("reminders", true) !== false

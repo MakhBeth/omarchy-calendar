@@ -47,6 +47,9 @@ BarWidget {
     keepCurrent: setting("nextDuringEvent", "announce") === "keep"
   })
   readonly property bool announcing: !vertical && barState.phase !== "idle"
+  // The bar has only so much room beside the clock: a title past this many
+  // characters ends in an ellipsis.
+  readonly property int announceTitleLimit: Math.max(8, Number(setting("announceTitleLimit", 28)) || 28)
   readonly property bool urgent: barState.phase === "live"
   readonly property bool emphasized: barState.phase === "imminent" || urgent
   readonly property string barMeetingUrl: emphasized ? Model.meetingUrlFor(barState.event) : ""
@@ -275,7 +278,7 @@ BarWidget {
 
       BarText {
         visible: root.announcing
-        text: Model.barLabel(root.barState, root.language)
+        text: Model.barLabel(root.barState, root.language, root.announceTitleLimit)
         color: root.emphasized ? root.phaseColor : button.foreground
         opacity: root.emphasized ? 1 : 0.78
         font.family: button.fontFamily
