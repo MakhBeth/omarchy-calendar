@@ -499,11 +499,10 @@ Column {
   }
 
   Repeater {
-    model: [
-      { key: "leftClick", button: "left" },
-      { key: "middleClick", button: "middle" },
-      { key: "rightClick", button: "right" }
-    ]
+    // Rebuilt on each change, so no button keeps the hover of a pick.
+    model: ["left", "middle", "right"].map(function(button) {
+      return { key: button + "Click", button: button, value: root.clickActions[button] }
+    })
 
     // The only button left on the panel keeps it: without one, the mouse
     // could not reach these settings again.
@@ -512,14 +511,13 @@ Column {
       foreground: root.foreground
       fontFamily: root.fontFamily
       label: root.tr("bar.click." + modelData.button)
-      hint: locked ? root.tr("settings.clickLocked") : ""
       locked: Model.clickLocked(root.clickActions, modelData.button)
       options: [
         { value: "panel", label: root.tr("settings.actionPanel") },
         { value: "join", label: root.tr("settings.actionJoin") },
         { value: "format", label: root.tr("settings.actionFormat") }
       ]
-      value: root.clickActions[modelData.button]
+      value: modelData.value
       onChosen: function(value) { root.pick(modelData.key, value) }
     }
   }
