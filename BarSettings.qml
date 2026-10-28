@@ -50,13 +50,19 @@ Column {
   readonly property Item field: vertical ? stackField : lineField
   readonly property string typed: Model.cleanClockFormat(field.text)
   readonly property string typedPreset: Model.presetClockFormat(typed, presets)
-  // The formats right click walks, as the bar builds its own list.
+  // The formats the format button walks, as the bar builds its own list.
   readonly property var ring: Model.clockFormatRing(clockFormat, clockAltFormat, presets, customFormat)
   // The preview counts down from 5 minutes, or less with a shorter lead.
   readonly property int previewMinutes: Math.min(5, leadMinutes)
 
   function tr(key, args) {
     return Strings.tr(root.language, key, args)
+  }
+
+  // A hint that names the button cycling the formats, or the same hint
+  // without that sentence when no button does.
+  function clickHint(key) {
+    return formatButton !== "" ? tr(key, [tr("bar.click." + formatButton)]) : tr(key + "NoClick")
   }
 
   function pick(key, value) {
@@ -114,7 +120,7 @@ Column {
 
   Text {
     width: parent.width
-    text: root.tr(root.vertical ? "settings.clockFormatHintVertical" : "settings.clockFormatHint")
+    text: root.clickHint(root.vertical ? "settings.clockFormatHintVertical" : "settings.clockFormatHint")
     color: root.faint
     font.family: root.fontFamily
     font.pixelSize: Style.font.caption
@@ -247,7 +253,7 @@ Column {
       x: Style.space(12)
       y: Style.space(8)
       width: parent.width - Style.space(24)
-      text: root.tr("settings.clockFormatBuiltIn")
+      text: root.clickHint("settings.clockFormatBuiltIn")
       color: root.foreground
       font.family: root.fontFamily
       font.pixelSize: Style.font.caption
@@ -420,7 +426,7 @@ Column {
     fontFamily: root.fontFamily
     label: root.tr("settings.titleLimit")
     hint: root.tr("settings.titleLimitHint")
-    options: [12, 16, 20, 28, 40].map(function(chars) {
+    options: Model.titleLimitChoices(root.titleLimit).map(function(chars) {
       return { value: String(chars), label: root.tr("settings.chars", [chars]) }
     })
     value: String(root.titleLimit)

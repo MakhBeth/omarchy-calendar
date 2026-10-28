@@ -233,7 +233,7 @@ function lifeProgressPercent(age, expectancy) {
   return Math.round(lifeProgress(age, expectancy) * 100)
 }
 
-// ---- Bar clock formats. Right-clicking the clock walks these in order and
+// ---- Bar clock formats. The format button walks these in order and
 //      writes the result back to shell.json, so the label the bar shows and
 //      the format the config stores are always the same thing.
 //
@@ -321,10 +321,11 @@ function presetClockFormat(format, presets) {
 
 // What to store when the user's own clock format is set to `typed`:
 // { custom, format }, for the bar's custom key and its format key. The
-// custom format has a key of its own so right click can walk away from it
-// and come back: cycling only ever rewrites the format key. A preset is not
-// kept as a custom format, since the ring already has it. Clearing the field
-// puts a bar that still shows the old custom format back on `defaultFormat`.
+// custom format has a key of its own so the format button can walk away
+// from it and come back: cycling only ever rewrites the format key. A preset
+// is not kept as a custom format, since the ring already has it. Clearing
+// the field puts a bar that still shows the old custom format back on
+// `defaultFormat`.
 function customClockFormatValues(typed, previousCustom, currentFormat, presets, defaultFormat) {
   var format = cleanClockFormat(typed)
   var preset = presetClockFormat(format, presets)
@@ -334,7 +335,7 @@ function customClockFormatValues(typed, previousCustom, currentFormat, presets, 
   return { custom: "", format: showsOld ? defaultFormat : text(currentFormat) }
 }
 
-// The custom format to keep when right click leaves `current`. A format
+// The custom format to keep when the format button leaves `current`. A format
 // written by hand in shell.json, before there was a custom key, would be
 // lost on that click, so it becomes the custom format instead. One already
 // set, a preset or the alternate format is left alone.
@@ -847,6 +848,24 @@ function relativeTime(event, nowMs, lang, long) {
 
 var MAX_ANNOUNCE_TITLE = 28
 
+// The lengths Settings > Bar offers for an announced title.
+var TITLE_LIMIT_CHOICES = [12, 16, 20, 28, 40]
+
+// The announced title length from the settings: 8 to 60 characters, as
+// the manifest allows, and the default for anything else.
+function announceTitleLimit(value) {
+  var chars = Math.round(Number(value))
+  return chars >= 8 && chars <= 60 ? chars : MAX_ANNOUNCE_TITLE
+}
+
+// The lengths Settings offers, with a length written by hand in shell.json
+// added in its place so the page still shows what the bar uses.
+function titleLimitChoices(current) {
+  var chars = announceTitleLimit(current)
+  if (TITLE_LIMIT_CHOICES.indexOf(chars) !== -1) return TITLE_LIMIT_CHOICES.slice()
+  return TITLE_LIMIT_CHOICES.concat([chars]).sort(function(a, b) { return a - b })
+}
+
 // A bar label is a fixed budget of horizontal space shared with every other
 // widget, so a long event title has to give.
 function truncateTitle(title, limit) {
@@ -984,7 +1003,7 @@ function clickTooltip(actions, lang) {
   return parts.join(" · ")
 }
 
-// The meeting a middle click on the bar means: the one being announced,
+// The meeting the join button means: the one being announced,
 // else one under way (the latest to start), else the next one today.
 function meetingToJoin(events, nowMs, announced) {
   if (announced && meetingUrlFor(announced)) return announced

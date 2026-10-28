@@ -1069,7 +1069,7 @@ Panel {
                 hideDeclined: root.hideDeclined
                 weekStartsMonday: root.weekStart === 1
                 announceLeadMinutes: root.setting("announceLeadMinutes", 15)
-                announceTitleLimit: Number(root.setting("announceTitleLimit", 28)) || 28
+                announceTitleLimit: Model.announceTitleLimit(root.setting("announceTitleLimit", 28))
                 clickActions: Model.clickActions(root.setting("leftClick", "panel"), root.setting("middleClick", "join"), root.setting("rightClick", "format"))
                 duringEvent: String(root.setting("duringEvent", "untilEnd"))
                 nextDuringEvent: String(root.setting("nextDuringEvent", "announce"))

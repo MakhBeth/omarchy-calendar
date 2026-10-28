@@ -278,3 +278,18 @@ test('formatButton names the first button that cycles the format', () => {
   assert.equal(Model.formatButton({ left: 'panel', middle: 'format', right: 'format' }), 'middle')
   assert.equal(Model.formatButton({ left: 'panel', middle: 'join', right: 'join' }), '')
 })
+
+test('announceTitleLimit keeps 8 to 60 characters and defaults the rest', () => {
+  assert.equal(Model.announceTitleLimit(16), 16)
+  assert.equal(Model.announceTitleLimit('33'), 33)
+  assert.equal(Model.announceTitleLimit(7), 28)
+  assert.equal(Model.announceTitleLimit(61), 28)
+  assert.equal(Model.announceTitleLimit(null), 28)
+  assert.equal(Model.announceTitleLimit('nonsense'), 28)
+})
+
+test('titleLimitChoices adds a hand-written length in its place', () => {
+  assert.deepEqual(Model.titleLimitChoices(16), [12, 16, 20, 28, 40])
+  assert.deepEqual(Model.titleLimitChoices(33), [12, 16, 20, 28, 33, 40])
+  assert.deepEqual(Model.titleLimitChoices(8), [8, 12, 16, 20, 28, 40])
+})

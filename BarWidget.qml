@@ -13,8 +13,9 @@ import "Strings.js" as Strings
 // chip in the last 10 minutes, and in the urgent colour for the first 2
 // minutes after it starts.
 //
-// Left click toggles the panel, middle click joins the current or next
-// meeting, right click walks the common label formats.
+// By default left click toggles the panel, middle click joins the current
+// or next meeting, right click walks the common label formats. The Bar
+// settings can give each button any of the three.
 BarWidget {
   id: root
   moduleName: "tmn73.calendar"
@@ -49,7 +50,7 @@ BarWidget {
   readonly property bool announcing: !vertical && barState.phase !== "idle"
   // The bar has only so much room beside the clock: a title past this many
   // characters ends in an ellipsis.
-  readonly property int announceTitleLimit: Math.max(8, Number(setting("announceTitleLimit", 28)) || 28)
+  readonly property int announceTitleLimit: Model.announceTitleLimit(setting("announceTitleLimit", 28))
   // What each mouse button does on the clock: panel, join or format.
   readonly property var clickActions: Model.clickActions(setting("leftClick", "panel"), setting("middleClick", "join"), setting("rightClick", "format"))
   readonly property bool urgent: barState.phase === "live"
@@ -341,7 +342,7 @@ BarWidget {
 
   // A small filled pill: the Join button and the "+N" badge. Only an
   // interactive chip takes the left click; anything else falls through to
-  // the widget, so the panel, middle and right click work on top of it.
+  // the widget, so the clock's own clicks work on top of it.
   component Chip: Rectangle {
     id: chip
     property alias text: chipLabel.text
