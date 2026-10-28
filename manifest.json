@@ -32,7 +32,10 @@
       "announceLeadMinutes": 15,
       "duringEvent": "untilEnd",
       "nextDuringEvent": "announce",
-      "announceTitleLimit": 28
+      "announceTitleLimit": 28,
+      "leftClick": "panel",
+      "middleClick": "join",
+      "rightClick": "format"
     },
     "schema": [
       {
@@ -109,6 +112,42 @@
         "step": 1,
         "defaultValue": 28,
         "description": "Longest title the bar announces, in characters; longer ones end in an ellipsis. Lower it when the announcement runs into the widgets beside it."
+      },
+      {
+        "key": "leftClick",
+        "type": "enum",
+        "label": "Click",
+        "options": [
+          "panel",
+          "join",
+          "format"
+        ],
+        "defaultValue": "panel",
+        "description": "What a click on the clock does: panel opens the panel, join opens the current or next meeting, format cycles the clock format."
+      },
+      {
+        "key": "middleClick",
+        "type": "enum",
+        "label": "Middle click",
+        "options": [
+          "panel",
+          "join",
+          "format"
+        ],
+        "defaultValue": "join",
+        "description": "What a middle click on the clock does, with the same choices as click."
+      },
+      {
+        "key": "rightClick",
+        "type": "enum",
+        "label": "Right click",
+        "options": [
+          "panel",
+          "join",
+          "format"
+        ],
+        "defaultValue": "format",
+        "description": "What a right click on the clock does, with the same choices as click."
       },
       {
         "key": "duringEvent",

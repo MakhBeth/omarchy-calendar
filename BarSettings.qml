@@ -18,6 +18,10 @@ Column {
   property string language: "en"
   property int leadMinutes: 15
   property int titleLimit: 28
+  // Each "panel" | "join" | "format"
+  property string leftClick: "panel"
+  property string middleClick: "join"
+  property string rightClick: "format"
   // "untilEnd" | "firstMinutes"
   property string duringEvent: "untilEnd"
   // "announce" | "keep"
@@ -420,6 +424,45 @@ Column {
     })
     value: String(root.titleLimit)
     onChosen: function(value) { root.pick("announceTitleLimit", Number(value)) }
+  }
+
+  Gap {}
+
+  SettingsCaption {
+    foreground: root.foreground
+    fontFamily: root.fontFamily
+    text: root.tr("settings.mouseButtons")
+  }
+
+  Text {
+    width: parent.width
+    text: root.tr("settings.mouseButtonsHint")
+    color: root.faint
+    font.family: root.fontFamily
+    font.pixelSize: Style.font.caption
+    wrapMode: Text.WordWrap
+  }
+
+  Repeater {
+    model: [
+      { key: "leftClick", label: "bar.click.left", value: root.leftClick },
+      { key: "middleClick", label: "bar.click.middle", value: root.middleClick },
+      { key: "rightClick", label: "bar.click.right", value: root.rightClick }
+    ]
+
+    ChoiceGroup {
+      required property var modelData
+      foreground: root.foreground
+      fontFamily: root.fontFamily
+      label: root.tr(modelData.label)
+      options: [
+        { value: "panel", label: root.tr("settings.actionPanel") },
+        { value: "join", label: root.tr("settings.actionJoin") },
+        { value: "format", label: root.tr("settings.actionFormat") }
+      ]
+      value: modelData.value
+      onChosen: function(value) { root.pick(modelData.key, value) }
+    }
   }
 
   Gap {}

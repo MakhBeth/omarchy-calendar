@@ -26,6 +26,10 @@ Item {
   // Bar
   property int announceLeadMinutes: 15
   property int announceTitleLimit: 28
+  // Each "panel" | "join" | "format"
+  property string leftClick: "panel"
+  property string middleClick: "join"
+  property string rightClick: "format"
   property string duringEvent: "untilEnd"
   property string nextDuringEvent: "announce"
   property bool reminders: true
@@ -239,6 +243,9 @@ Item {
         language: root.language
         leadMinutes: root.announceLeadMinutes
         titleLimit: root.announceTitleLimit
+        leftClick: root.leftClick
+        middleClick: root.middleClick
+        rightClick: root.rightClick
         duringEvent: root.duringEvent
         nextDuringEvent: root.nextDuringEvent
         reminders: root.reminders

@@ -31,6 +31,9 @@ class TestManifest(unittest.TestCase):
         self.assertEqual(schema["duringEvent"]["options"], ["untilEnd", "firstMinutes"])
         self.assertEqual(schema["nextDuringEvent"]["options"], ["announce", "keep"])
         self.assertEqual(schema["announceTitleLimit"]["type"], "number")
+        for key, default in (("leftClick", "panel"), ("middleClick", "join"), ("rightClick", "format")):
+            self.assertEqual(schema[key]["options"], ["panel", "join", "format"])
+            self.assertEqual(schema[key]["defaultValue"], default)
         for key, value in (("language", "auto"), ("reminders", True), ("announceLeadMinutes", 15),
                            ("duringEvent", "untilEnd"), ("nextDuringEvent", "announce")):
             self.assertEqual(schema[key]["defaultValue"], value)

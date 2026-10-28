@@ -931,6 +931,33 @@ function barLabel(state, lang, limit) {
   return Strings.tr(lang, "bar.soon", [title, spanText(Math.max(1, Math.ceil(state.countdownMs / MINUTE_MS)), lang)])
 }
 
+// ---- Mouse buttons
+
+var CLICK_BUTTONS = ["left", "middle", "right"]
+var CLICK_ACTIONS = ["panel", "join", "format"]
+var DEFAULT_CLICKS = { left: "panel", middle: "join", right: "format" }
+
+// What a mouse button does on the clock: open the panel, join the current
+// or next meeting, or cycle the clock format. Anything else in the settings
+// falls back to the button's default.
+function clickAction(button, value) {
+  var action = text(value).trim()
+  return CLICK_ACTIONS.indexOf(action) === -1 ? DEFAULT_CLICKS[button] : action
+}
+
+// The tooltip's last line, one phrase per button in order: "Click: open
+// the panel · Middle click: join the next meeting · Right click: change
+// the format".
+function clickTooltip(actions, lang) {
+  var parts = []
+  for (var i = 0; i < CLICK_BUTTONS.length; i++) {
+    var button = CLICK_BUTTONS[i]
+    var action = clickAction(button, actions ? actions[button] : "")
+    parts.push(Strings.tr(lang, "bar.tooltipPart", [Strings.tr(lang, "bar.click." + button), Strings.tr(lang, "bar.action." + action)]))
+  }
+  return parts.join(" · ")
+}
+
 // The meeting a middle click on the bar means: the one being announced,
 // else one under way (the latest to start), else the next one today.
 function meetingToJoin(events, nowMs, announced) {

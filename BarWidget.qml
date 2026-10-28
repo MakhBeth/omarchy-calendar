@@ -50,6 +50,12 @@ BarWidget {
   // The bar has only so much room beside the clock: a title past this many
   // characters ends in an ellipsis.
   readonly property int announceTitleLimit: Math.max(8, Number(setting("announceTitleLimit", 28)) || 28)
+  // What each mouse button does on the clock: panel, join or format.
+  readonly property var clickActions: ({
+    left: Model.clickAction("left", setting("leftClick", "panel")),
+    middle: Model.clickAction("middle", setting("middleClick", "join")),
+    right: Model.clickAction("right", setting("rightClick", "format"))
+  })
   readonly property bool urgent: barState.phase === "live"
   readonly property bool emphasized: barState.phase === "imminent" || urgent
   readonly property string barMeetingUrl: emphasized ? Model.meetingUrlFor(barState.event) : ""
@@ -100,6 +106,12 @@ BarWidget {
     var url = Model.meetingUrlFor(event || Model.meetingToJoin(visibleEvents, Date.now(), barState.event))
     if (url) Qt.openUrlExternally(url)
     else reminders.notice(Strings.tr(language, "toast.noMeeting"))
+  }
+
+  function runClick(action) {
+    if (action === "join") join(null)
+    else if (action === "format") cycleFormat()
+    else togglePanel()
   }
 
   // ---- Reminders. One widget exists per monitor; the first one sends, and
@@ -236,13 +248,11 @@ BarWidget {
     horizontalMargin: 8.75
     verticalPadding: 8.75
     tooltipText: root.announcing
-      ? Model.text(root.barState.event.title) + "\n" + Strings.tr(root.language, "bar.tooltip")
-      : Strings.tr(root.language, "bar.tooltip")
+      ? Model.text(root.barState.event.title) + "\n" + Model.clickTooltip(root.clickActions, root.language)
+      : Model.clickTooltip(root.clickActions, root.language)
 
     onPressed: function(b) {
-      if (b === Qt.RightButton) root.cycleFormat()
-      else if (b === Qt.MiddleButton) root.join(null)
-      else root.togglePanel()
+      root.runClick(root.clickActions[b === Qt.RightButton ? "right" : b === Qt.MiddleButton ? "middle" : "left"])
     }
 
     Row {

@@ -242,3 +242,20 @@ test('the default and alternate formats are presets of their orientation', () =>
   assert.equal(Model.defaultClockFormat(false), 'dddd HH:mm')
   assert.equal(Model.defaultAltClockFormat(true), "dd\nMMM\n'W'ww\n''yy")
 })
+
+test('clickAction keeps a known action and falls back to the button default', () => {
+  assert.equal(Model.clickAction('right', 'join'), 'join')
+  assert.equal(Model.clickAction('left', ' format '), 'format')
+  assert.equal(Model.clickAction('right', 'nonsense'), 'format')
+  assert.equal(Model.clickAction('middle', undefined), 'join')
+  assert.equal(Model.clickAction('left', null), 'panel')
+})
+
+test('clickTooltip words every button in order, in both languages', () => {
+  assert.equal(Model.clickTooltip({}, 'en'),
+    'Click: open the panel · Middle click: join the next meeting · Right click: change the format')
+  assert.equal(Model.clickTooltip({ right: 'join' }, 'en'),
+    'Click: open the panel · Middle click: join the next meeting · Right click: join the next meeting')
+  assert.equal(Model.clickTooltip({ left: 'join', middle: 'panel', right: 'bogus' }, 'pt'),
+    'Clique: entra na próxima reunião · Clique do meio: abre o painel · Clique direito: alterna o formato')
+})
