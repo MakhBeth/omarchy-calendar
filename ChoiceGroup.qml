@@ -62,13 +62,15 @@ Column {
         required property var modelData
         text: modelData.label
         selected: modelData.value === root.value
-        enabled: !root.locked || selected
-        opacity: enabled ? 1 : 0.4
+        // Not `enabled: false`: a button disabled under the pointer never
+        // hears it leave and keeps its hover fill.
+        readonly property bool held: root.locked && !selected
+        opacity: held ? 0.4 : 1
         bordered: true
         foreground: root.foreground
         fontFamily: root.fontFamily
         fontSize: Style.font.bodySmall
-        onClicked: root.chosen(modelData.value)
+        onClicked: if (!held) root.chosen(modelData.value)
       }
     }
   }
