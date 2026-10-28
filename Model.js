@@ -945,6 +945,32 @@ function clickAction(button, value) {
   return CLICK_ACTIONS.indexOf(action) === -1 ? DEFAULT_CLICKS[button] : action
 }
 
+// The three buttons' actions from the settings. At least one button opens
+// the panel, since the settings live there: a shell.json that leaves none
+// gives the click back to the panel.
+function clickActions(left, middle, right) {
+  var actions = { left: clickAction("left", left), middle: clickAction("middle", middle), right: clickAction("right", right) }
+  if (actions.left !== "panel" && actions.middle !== "panel" && actions.right !== "panel") actions.left = "panel"
+  return actions
+}
+
+// True for the only button that opens the panel: Settings keeps it there.
+function clickLocked(actions, button) {
+  if (!actions || actions[button] !== "panel") return false
+  for (var i = 0; i < CLICK_BUTTONS.length; i++) {
+    if (CLICK_BUTTONS[i] !== button && actions[CLICK_BUTTONS[i]] === "panel") return false
+  }
+  return true
+}
+
+// The first button that cycles the clock format, or "" when none does.
+function formatButton(actions) {
+  for (var i = 0; i < CLICK_BUTTONS.length; i++) {
+    if (actions && actions[CLICK_BUTTONS[i]] === "format") return CLICK_BUTTONS[i]
+  }
+  return ""
+}
+
 // The tooltip's last line, one phrase per button in order: "Click: open
 // the panel · Middle click: join the next meeting · Right click: change
 // the format".

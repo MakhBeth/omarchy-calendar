@@ -17,6 +17,8 @@ Column {
   // [{ value, label }]
   property var options: []
   property string value: ""
+  // Holds the current value: the other options dim and ignore clicks.
+  property bool locked: false
 
   signal chosen(string value)
 
@@ -60,6 +62,8 @@ Column {
         required property var modelData
         text: modelData.label
         selected: modelData.value === root.value
+        enabled: !root.locked || selected
+        opacity: enabled ? 1 : 0.4
         bordered: true
         foreground: root.foreground
         fontFamily: root.fontFamily

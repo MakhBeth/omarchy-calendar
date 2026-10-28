@@ -51,11 +51,7 @@ BarWidget {
   // characters ends in an ellipsis.
   readonly property int announceTitleLimit: Math.max(8, Number(setting("announceTitleLimit", 28)) || 28)
   // What each mouse button does on the clock: panel, join or format.
-  readonly property var clickActions: ({
-    left: Model.clickAction("left", setting("leftClick", "panel")),
-    middle: Model.clickAction("middle", setting("middleClick", "join")),
-    right: Model.clickAction("right", setting("rightClick", "format"))
-  })
+  readonly property var clickActions: Model.clickActions(setting("leftClick", "panel"), setting("middleClick", "join"), setting("rightClick", "format"))
   readonly property bool urgent: barState.phase === "live"
   readonly property bool emphasized: barState.phase === "imminent" || urgent
   readonly property string barMeetingUrl: emphasized ? Model.meetingUrlFor(barState.event) : ""

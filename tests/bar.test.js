@@ -259,3 +259,22 @@ test('clickTooltip words every button in order, in both languages', () => {
   assert.equal(Model.clickTooltip({ left: 'join', middle: 'panel', right: 'bogus' }, 'pt'),
     'Clique: entra na próxima reunião · Clique do meio: abre o painel · Clique direito: alterna o formato')
 })
+
+test('clickActions keeps one button on the panel', () => {
+  assert.deepEqual(Model.clickActions('join', 'format', 'panel'), { left: 'join', middle: 'format', right: 'panel' })
+  assert.deepEqual(Model.clickActions('join', 'join', 'format'), { left: 'panel', middle: 'join', right: 'format' })
+  assert.deepEqual(Model.clickActions(undefined, undefined, undefined), { left: 'panel', middle: 'join', right: 'format' })
+})
+
+test('clickLocked holds only the last button on the panel', () => {
+  const one = { left: 'join', middle: 'panel', right: 'format' }
+  assert.equal(Model.clickLocked(one, 'middle'), true)
+  assert.equal(Model.clickLocked(one, 'left'), false)
+  assert.equal(Model.clickLocked({ left: 'panel', middle: 'panel', right: 'join' }, 'left'), false)
+})
+
+test('formatButton names the first button that cycles the format', () => {
+  assert.equal(Model.formatButton({ left: 'panel', middle: 'join', right: 'format' }), 'right')
+  assert.equal(Model.formatButton({ left: 'panel', middle: 'format', right: 'format' }), 'middle')
+  assert.equal(Model.formatButton({ left: 'panel', middle: 'join', right: 'join' }), '')
+})

@@ -18,10 +18,10 @@ Column {
   property string language: "en"
   property int leadMinutes: 15
   property int titleLimit: 28
-  // Each "panel" | "join" | "format"
-  property string leftClick: "panel"
-  property string middleClick: "join"
-  property string rightClick: "format"
+  // { left, middle, right }, each "panel" | "join" | "format"
+  property var clickActions: ({ left: "panel", middle: "join", right: "format" })
+  // The button that cycles the formats below, "" when none does.
+  readonly property string formatButton: Model.formatButton(clickActions)
   // "untilEnd" | "firstMinutes"
   property string duringEvent: "untilEnd"
   // "announce" | "keep"
@@ -260,17 +260,18 @@ Column {
     spacing: Style.space(8)
 
     KeyCap {
-      id: rightClick
+      id: formatKey
+      visible: root.formatButton !== ""
       foreground: root.foreground
       fontFamily: root.fontFamily
-      text: root.tr("settings.rightClick")
+      text: root.formatButton !== "" ? root.tr("bar.click." + root.formatButton) : ""
     }
 
     // Spaces inside a format do not break, so a line only wraps between two
     // formats.
     Text {
       visible: !root.vertical
-      width: parent.width - rightClick.width - parent.spacing
+      width: parent.width - (formatKey.visible ? formatKey.width + parent.spacing : 0)
       textFormat: Text.PlainText
       text: root.ring.map(function(format) { return root.render(format).replace(/ /g, " ") }).join("  ›  ")
       color: root.faint
@@ -282,7 +283,7 @@ Column {
     // On a vertical bar, each format as the small stack the bar draws.
     Flow {
       visible: root.vertical
-      width: parent.width - rightClick.width - parent.spacing
+      width: parent.width - (formatKey.visible ? formatKey.width + parent.spacing : 0)
       spacing: Style.space(6)
 
       Repeater {
@@ -428,45 +429,6 @@ Column {
 
   Gap {}
 
-  SettingsCaption {
-    foreground: root.foreground
-    fontFamily: root.fontFamily
-    text: root.tr("settings.mouseButtons")
-  }
-
-  Text {
-    width: parent.width
-    text: root.tr("settings.mouseButtonsHint")
-    color: root.faint
-    font.family: root.fontFamily
-    font.pixelSize: Style.font.caption
-    wrapMode: Text.WordWrap
-  }
-
-  Repeater {
-    model: [
-      { key: "leftClick", label: "bar.click.left", value: root.leftClick },
-      { key: "middleClick", label: "bar.click.middle", value: root.middleClick },
-      { key: "rightClick", label: "bar.click.right", value: root.rightClick }
-    ]
-
-    ChoiceGroup {
-      required property var modelData
-      foreground: root.foreground
-      fontFamily: root.fontFamily
-      label: root.tr(modelData.label)
-      options: [
-        { value: "panel", label: root.tr("settings.actionPanel") },
-        { value: "join", label: root.tr("settings.actionJoin") },
-        { value: "format", label: root.tr("settings.actionFormat") }
-      ]
-      value: modelData.value
-      onChosen: function(value) { root.pick(modelData.key, value) }
-    }
-  }
-
-  Gap {}
-
   ChoiceGroup {
     foreground: root.foreground
     fontFamily: root.fontFamily
@@ -517,5 +479,48 @@ Column {
     hint: root.tr("settings.reminderDetailsHint")
     checked: root.reminderDetails
     onActivated: root.pick("reminderDetails", !root.reminderDetails)
+  }
+
+  Gap {}
+
+  SettingsCaption {
+    foreground: root.foreground
+    fontFamily: root.fontFamily
+    text: root.tr("settings.mouseButtons")
+  }
+
+  Text {
+    width: parent.width
+    text: root.tr("settings.mouseButtonsHint")
+    color: root.faint
+    font.family: root.fontFamily
+    font.pixelSize: Style.font.caption
+    wrapMode: Text.WordWrap
+  }
+
+  Repeater {
+    model: [
+      { key: "leftClick", button: "left" },
+      { key: "middleClick", button: "middle" },
+      { key: "rightClick", button: "right" }
+    ]
+
+    // The only button left on the panel keeps it: without one, the mouse
+    // could not reach these settings again.
+    ChoiceGroup {
+      required property var modelData
+      foreground: root.foreground
+      fontFamily: root.fontFamily
+      label: root.tr("bar.click." + modelData.button)
+      hint: locked ? root.tr("settings.clickLocked") : ""
+      locked: Model.clickLocked(root.clickActions, modelData.button)
+      options: [
+        { value: "panel", label: root.tr("settings.actionPanel") },
+        { value: "join", label: root.tr("settings.actionJoin") },
+        { value: "format", label: root.tr("settings.actionFormat") }
+      ]
+      value: root.clickActions[modelData.button]
+      onChosen: function(value) { root.pick(modelData.key, value) }
+    }
   }
 }
